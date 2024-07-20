@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Scientific Calculator</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f7f7f7;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .calculator {
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            width: 400px;
+        }
+
+        .calculator .display {
+            background: #333;
+            color: #fff;
+            border-radius: 10px;
+            font-size: 2.5rem;
+            text-align: right;
+            padding: 20px;
+            margin-bottom: 20px;
+            height: 80px;
+            overflow-x: auto;
+        }
+
+        .calculator button {
+            width: 20%;
+            height: 60px;
+            margin: 5px;
+            font-size: 1.5rem;
+            border: none;
+            border-radius: 10px;
+            background: #e0e0e0;
+            transition: all 0.3s ease;
+        }
+
+        .calculator button:hover {
+            background: #d0d0d0;
+        }
+
+        .calculator .btn-operation {
+            background: #f7b731;
+            color: #fff;
+        }
+
+        .calculator .btn-operation:hover {
+            background: #e6a813;
+        }
+
+        .calculator .btn-equal {
+            background: #20bf6b;
+            color: #fff;
+        }
+
+        .calculator .btn-equal:hover {
+            background: #1eab63;
+        }
+
+        .calculator .btn-clear {
+            background: #eb3b5a;
+            color: #fff;
+        }
+
+        .calculator .btn-clear:hover {
+            background: #d92c47;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="calculator">
+        <div class="display" id="display">0</div>
+        <div class="buttons">
+            <button class="btn btn-clear" onclick="clearDisplay()">C</button>
+            <button class="btn btn-operation" onclick="appendOperation('**')">x<sup>y</sup></button>
+            <button class="btn btn-operation" onclick="appendOperation('sqrt(')">√</button>
+            <button class="btn btn-operation" onclick="appendOperation('log(')">log</button>
+            <button class="btn btn-operation" onclick="appendOperation('sin(')">sin</button>
+            <button class="btn btn-operation" onclick="appendOperation('cos(')">cos</button>
+            <button class="btn btn-operation" onclick="appendOperation('tan(')">tan</button>
+            <button class="btn btn-operation" onclick="appendOperation('/')">÷</button>
+            <button class="btn" onclick="appendNumber('7')">7</button>
+            <button class="btn" onclick="appendNumber('8')">8</button>
+            <button class="btn" onclick="appendNumber('9')">9</button>
+            <button class="btn btn-operation" onclick="appendOperation('*')">×</button>
+            <button class="btn" onclick="appendNumber('4')">4</button>
+            <button class="btn" onclick="appendNumber('5')">5</button>
+            <button class="btn" onclick="appendNumber('6')">6</button>
+            <button class="btn btn-operation" onclick="appendOperation('-')">−</button>
+            <button class="btn" onclick="appendNumber('1')">1</button>
+            <button class="btn" onclick="appendNumber('2')">2</button>
+            <button class="btn" onclick="appendNumber('3')">3</button>
+            <button class="btn btn-operation" onclick="appendOperation('+')">+</button>
+            <button class="btn" onclick="appendNumber('0')">0</button>
+            <button class="btn" onclick="appendNumber('.')">.</button>
+            <button class="btn btn-equal" onclick="calculateResult()">=</button>
+        </div>
+    </div>
+
+    <script>
+        let display = document.getElementById('display');
+        let currentInput = '';
+        let currentOperation = null;
+        let previousInput = '';
+
+        function appendNumber(number) {
+            if (currentInput === '0' && number !== '.') {
+                currentInput = number;
+            } else {
+                currentInput += number;
+            }
+            updateDisplay();
+        }
+
+        function appendOperation(operation) {
+            if (currentInput === '' && operation !== '-') {
+                return;
+            }
+
+            if (currentOperation !== null) {
+                calculateResult();
+            }
+
+            previousInput = currentInput;
+            currentOperation = operation;
+            currentInput = '';
+        }
+
+        function calculateResult() {
+            if (currentOperation === null || currentInput === '') {
+                return;
+            }
+
+            let result;
+            const prev = parseFloat(previousInput);
+            const current = parseFloat(currentInput);
+
+            try {
+                switch (currentOperation) {
+                    case '+':
+                        result = prev + current;
+                        break;
+                    case '-':
+                        result = prev - current;
+                        break;
+                    case '*':
+                        result = prev * current;
+                        break;
+                    case '/':
+                        result = prev / current;
+                        break;
+                    case '**':
+                        result = Math.pow(prev, current);
+                        break;
+                    case 'sqrt(':
+                        result = Math.sqrt(current);
+                        currentOperation = null; // Reset the operation
+                        break;
+                    case 'log(':
+                        result = Math.log10(current);
+                        currentOperation = null; // Reset the operation
+                        break;
+                    case 'sin(':
+                        result = Math.sin(current * Math.PI / 180);
+                        currentOperation = null; // Reset the operation
+                        break;
+                    case 'cos(':
+                        result = Math.cos(current * Math.PI / 180);
+                        currentOperation = null; // Reset the operation
+                        break;
+                    case 'tan(':
+                        result = Math.tan(current * Math.PI / 180);
+                        currentOperation = null; // Reset the operation
+                        break;
+                    default:
+                        return;
+                }
+
+                currentInput = result.toString();
+                currentOperation = null;
+                previousInput = '';
+                updateDisplay();
+            } catch (error) {
+                currentInput = 'Error';
+                updateDisplay();
+            }
+        }
+
+        function clearDisplay() {
+            currentInput = '';
+            currentOperation = null;
+            previousInput = '';
+            updateDisplay();
+        }
+
+        function updateDisplay() {
+            display.innerText = currentInput || '0';
+        }
+    </script>
+</body>
+
+</html>
